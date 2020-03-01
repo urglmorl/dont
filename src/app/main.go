@@ -2,16 +2,15 @@ package main
 
 import (
 	"api"
+	"constants"
 	"context"
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
-	"sessions"
-	"store"
-	"strings"
 	"time"
+	"utils"
 )
 
 func main() {
@@ -19,19 +18,14 @@ func main() {
 	//  Здесь должна быть проверка на существование ключа шифрования сессий и если этого ключа нет - генерировать новый
 	//  Можно сохранять ключ шифрования либо в переменные ОС, а можно и в базу данных
 
-	sessions.Init()
-	store.Init()
-
 	stopChan := make(chan os.Signal)
 	signal.Notify(stopChan, os.Interrupt)
 
-	host := "/dont/api/v1/"
-
 	router := mux.NewRouter().StrictSlash(true)
-	mount(router, host, api.Router())
+	utils.Mount(router, constants.RootRoute, api.Router())
 
 	srv := &http.Server{
-		Addr:         ":32678",
+		Addr:         constants.Port,
 		ReadTimeout:  60 * time.Second,
 		WriteTimeout: 60 * time.Second,
 		IdleTimeout:  60 * time.Second,
@@ -39,7 +33,7 @@ func main() {
 	}
 
 	go func() {
-		log.Println("Listening on port ", ":32678")
+		log.Println("Listening on port ", constants.Port)
 		if err := srv.ListenAndServe(); err != nil {
 			log.Printf("listen: %s\n", err)
 		}
@@ -58,13 +52,4 @@ func checkErr(err error) {
 	if err != nil {
 		log.Fatal(err)
 	}
-}
-
-func mount(r *mux.Router, path string, handler http.Handler) {
-	r.PathPrefix(path).Handler(
-		http.StripPrefix(
-			strings.TrimSuffix(path, "/"),
-			handler,
-		),
-	)
 }

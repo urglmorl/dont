@@ -5,6 +5,6 @@ import (
 )
 
 type Settings struct {
-	Id         bson.ObjectId `bson:"_id"`
-	SessionKey string        `bson:"sessionKey"`
+	Id         bson.ObjectId
+	SessionKey string
 }

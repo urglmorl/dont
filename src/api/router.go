@@ -2,29 +2,25 @@ package api
 
 import (
 	"api/auth"
+	"api/questions"
 	"api/subjects"
 	"api/tests"
+	"api/themes"
+	"constants"
 	"github.com/gorilla/mux"
 	"net/http"
-	"strings"
+	"utils"
 )
 
 func Router() *mux.Router {
 	router := mux.NewRouter().StrictSlash(true)
-	router.HandleFunc("/", index)
-	mount(router, "/subjects", subjects.Router())
-	mount(router, "/tests", tests.Router())
-	mount(router, "/auth", auth.Router())
+	router.HandleFunc(constants.Root, index)
+	utils.Mount(router, constants.SubjectRoute, subjects.Router())
+	utils.Mount(router, constants.ThemeRoute, themes.Router())
+	utils.Mount(router, constants.QuestionRoute, questions.Router())
+	utils.Mount(router, constants.TestRoute, tests.Router())
+	utils.Mount(router, constants.AuthRoute, auth.Router())
 	return router
-}
-
-func mount(r *mux.Router, path string, handler http.Handler) {
-	r.PathPrefix(path).Handler(
-		http.StripPrefix(
-			strings.TrimSuffix(path, "/"),
-			handler,
-		),
-	)
 }
 
 func index(w http.ResponseWriter, r *http.Request) {

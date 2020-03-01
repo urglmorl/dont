@@ -1,14 +1,15 @@
 package auth
 
 import (
+	"constants"
 	"github.com/gorilla/mux"
 	"net/http"
 )
 
 func Router() *mux.Router {
 	router := mux.NewRouter().StrictSlash(true)
-	router.HandleFunc("/login", login).Methods("POST")
-	router.HandleFunc("refresh-token", refreshToken).Methods("POST")
+	router.HandleFunc(constants.LoginRoute, login).Methods("POST")
+	router.HandleFunc(constants.RefreshTokenRoute, refreshToken).Methods("POST")
 	return router
 }
 
